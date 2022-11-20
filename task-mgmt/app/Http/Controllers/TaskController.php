@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Task;
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
+
 class TaskController extends Controller
 {
     /**
@@ -14,17 +18,7 @@ class TaskController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        return Task::select('id', 'label', 'status')->get();
     }
 
     /**
@@ -35,7 +29,23 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'label' => 'required',
+            'status' => 'required'
+        ]);
+
+        try{
+            Task::create($request->post());
+
+            return response()->json([
+                'message' => 'Task created'
+            ]);
+        } catch(\Exception $e){
+            \Log::error($e->getMessage());
+            return response()->json([
+                'message' => 'Error while creating a task'
+            ], 500);
+        }
     }
 
     /**
@@ -46,18 +56,9 @@ class TaskController extends Controller
      */
     public function show(Task $task)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Task  $task
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Task $task)
-    {
-        //
+        return response()->json([
+            'task' => $task
+        ]);
     }
 
     /**
@@ -69,7 +70,25 @@ class TaskController extends Controller
      */
     public function update(Request $request, Task $task)
     {
-        //
+        $request->validate([
+            'label'=>'required',
+            'status'=>'required'
+        ]);
+
+        try{
+
+            $task->fill($request->post())->update();
+
+            return response()->json([
+                'message' => 'Task updated'
+            ]);
+
+        }catch(\Exception $e){
+            \Log::error($e->getMessage());
+            return response()->json([
+                'message' => 'Error while updating a task'
+            ],500);
+        }
     }
 
     /**
@@ -80,6 +99,19 @@ class TaskController extends Controller
      */
     public function destroy(Task $task)
     {
-        //
+        try {
+            $task->delete();
+
+            return response()->json([
+                'message' => 'Task deleted'
+            ]);
+            
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            return response()->json([
+                'message' => 'Error while deleting a task'
+            ]);
+        }
     }
+    
 }
