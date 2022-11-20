@@ -77,7 +77,7 @@ export default function TaskList() {
                                                 
                                                 <td>
                                                     <Link to={`/task/edit/${row.id}`} className='btn btn-success me-2'>
-                                                        Chokidar
+                                                        Edit
                                                     </Link>
                                                     <Button variant="danger" onClick={()=>deleteTask(row.id)}>
                                                         Delete
